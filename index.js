@@ -1,7 +1,7 @@
 // index.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Configuration, OpenAIApi } = require('openai'); // Import OpenAI package
+const OpenAI = require('openai'); // Import OpenAI package
 require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
@@ -11,10 +11,9 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // Initialize OpenAI API
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Use environment variable for OpenAI API key
 });
-const openai = new OpenAIApi(configuration);
 
 // Route for handling WhatsApp webhooks
 app.post('/webhook', async (req, res) => {
@@ -27,12 +26,12 @@ app.post('/webhook', async (req, res) => {
       
       // Send the message to ChatGPT using OpenAI package
       try {
-        const response = await openai.createChatCompletion({
+        const response = await openai.chat.completions.create({
           model: 'gpt-3.5-turbo', // or the model you want to use
           messages: [{ role: 'user', content: message.text }],
         });
 
-        const chatGptResponse = response.data.choices[0].message.content;
+        const chatGptResponse = response.choices[0].message.content;
 
         // Here you would send the response back to the user via WhatsApp API
         console.log(`Response from ChatGPT: ${chatGptResponse}`);
